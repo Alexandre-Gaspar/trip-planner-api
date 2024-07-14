@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -31,6 +33,23 @@ public class TripController {
     @GetMapping("/{id}")
     public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id) {
         var tripFound = repository.findById(id);
+        return tripFound.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Trip> updateTrip(@PathVariable UUID id, @RequestBody TripRequestPayload payload) {
+        var tripFound = repository.findById(id);
+
+        if (tripFound.isPresent()) {
+            var rawTrip = tripFound.get();
+            rawTrip.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
+            rawTrip.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
+            rawTrip.setDestination(payload.destination());
+
+            this.repository.save(rawTrip);
+
+            return ResponseEntity.ok(rawTrip);
+        }
         return tripFound.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
