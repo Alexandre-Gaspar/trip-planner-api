@@ -52,4 +52,20 @@ public class TripController {
         }
         return tripFound.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/{id}/confirm")
+    public ResponseEntity<Trip> confirmTrip(@PathVariable UUID id) {
+        var tripFound = this.repository.findById(id);
+
+        if (tripFound.isPresent()) {
+            var rawTrip = tripFound.get();
+            rawTrip.setIsConfirmed(true);
+
+            this.repository.save(rawTrip);
+            this.participantService.triggerConfirmationEmailToParticipants(id);
+
+            return ResponseEntity.ok(rawTrip);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
