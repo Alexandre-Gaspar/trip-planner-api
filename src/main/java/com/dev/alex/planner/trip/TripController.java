@@ -25,7 +25,7 @@ public class TripController {
         Trip newTrip = new Trip(payload);
 
         this.repository.save(newTrip);
-        this.participantService.registerParticipantsToTrip(payload.emails_to_invite(), newTrip.getId());
+        this.participantService.registerParticipantsToTrip(payload.emails_to_invite(), newTrip);
 
         return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
     }
