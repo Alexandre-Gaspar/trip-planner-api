@@ -1,5 +1,7 @@
 package com.dev.alex.planner.trip;
 
+import com.dev.alex.planner.participant.ParticipantCreateResponse;
+import com.dev.alex.planner.participant.ParticipantRequestPayload;
 import com.dev.alex.planner.participant.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -15,7 +19,7 @@ import java.util.UUID;
 public class TripController {
 
     @Autowired
-    private ParticipantService participantService;
+    private ParticipantService  participantService;
 
     @Autowired
     private TripRepository repository;
@@ -66,6 +70,23 @@ public class TripController {
 
             return ResponseEntity.ok(rawTrip);
         }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipants(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
+        var trip = this.repository.findById(id);
+
+        if (trip.isPresent()) {
+            Trip rawTrip = trip.get();
+
+            ParticipantCreateResponse participantCreateResponse = this.participantService.registerParticipantToTrip(payload.email(), rawTrip);
+
+            if (rawTrip.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(payload.email());
+
+            return ResponseEntity.ok(participantCreateResponse); // returns the id of the invited participant
+        }
+
         return ResponseEntity.notFound().build();
     }
 }
