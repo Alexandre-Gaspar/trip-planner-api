@@ -22,7 +22,7 @@ public class ActivityService {
         return new ActivityCreateResponse(newActivity.getId());
     }
 
-    public List<ActivityData> getAllActivitiesFromtrip(UUID id) {
+    public List<ActivityData> getAllActivitiesFromTrip(UUID id) {
         return this.repository.findByTripId(id)
                 .stream()
                 .map(activity -> new ActivityData(activity.getId(), activity.getTitle(), activity.getOccursAt()))
