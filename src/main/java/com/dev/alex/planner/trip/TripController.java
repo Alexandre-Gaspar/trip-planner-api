@@ -1,17 +1,13 @@
 package com.dev.alex.planner.trip;
 
-import com.dev.alex.planner.participant.ParticipantCreateResponse;
-import com.dev.alex.planner.participant.ParticipantRequestPayload;
-import com.dev.alex.planner.participant.ParticipantService;
+import com.dev.alex.planner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RestController
@@ -21,8 +17,11 @@ public class TripController {
     @Autowired
     private ParticipantService  participantService;
 
-    @Autowired
     private TripRepository repository;
+
+    public TripController(TripRepository repository) {
+        this.repository = repository;
+    }
 
     @PostMapping
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
@@ -88,5 +87,12 @@ public class TripController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
+
+        return ResponseEntity.ok(participantList);
     }
 }
