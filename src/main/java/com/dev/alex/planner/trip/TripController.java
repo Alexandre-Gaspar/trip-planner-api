@@ -1,5 +1,9 @@
 package com.dev.alex.planner.trip;
 
+import com.dev.alex.planner.activities.ActivityCreateResponse;
+import com.dev.alex.planner.activities.ActivityData;
+import com.dev.alex.planner.activities.ActivityRequestPayload;
+import com.dev.alex.planner.activities.ActivityService;
 import com.dev.alex.planner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,9 @@ public class TripController {
 
     @Autowired
     private ParticipantService  participantService;
+
+    @Autowired
+    private ActivityService activityService;
 
     private TripRepository repository;
 
@@ -89,10 +96,32 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityCreateResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
+        var trip = this.repository.findById(id);
+
+        if (trip.isPresent()) {
+            Trip rawTrip = trip.get();
+
+            ActivityCreateResponse activityCreateResponse = this.activityService.registerActivity(payload, rawTrip);
+
+            return ResponseEntity.ok(activityCreateResponse); // returns the id of the invited participant
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
         List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
 
         return ResponseEntity.ok(participantList);
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id) {
+        List<ActivityData> activityList = this.activityService.getAllActivitiesFromtrip(id);
+
+        return ResponseEntity.ok(activityList);
     }
 }
