@@ -1,4 +1,4 @@
-package com.dev.alex.planner.activities;
+package com.dev.alex.planner.activity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

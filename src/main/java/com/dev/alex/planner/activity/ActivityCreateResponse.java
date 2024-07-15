@@ -1,4 +1,4 @@
-package com.dev.alex.planner.activities;
+package com.dev.alex.planner.activity;
 
 import java.util.UUID;
 

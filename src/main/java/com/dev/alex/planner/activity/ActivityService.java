@@ -1,11 +1,8 @@
-package com.dev.alex.planner.activities;
+package com.dev.alex.planner.activity;
 
-import com.dev.alex.planner.participant.ParticipantData;
 import com.dev.alex.planner.trip.Trip;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 

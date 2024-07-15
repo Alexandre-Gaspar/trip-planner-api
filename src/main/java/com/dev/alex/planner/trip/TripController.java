@@ -1,9 +1,9 @@
 package com.dev.alex.planner.trip;
 
-import com.dev.alex.planner.activities.ActivityCreateResponse;
-import com.dev.alex.planner.activities.ActivityData;
-import com.dev.alex.planner.activities.ActivityRequestPayload;
-import com.dev.alex.planner.activities.ActivityService;
+import com.dev.alex.planner.activity.ActivityCreateResponse;
+import com.dev.alex.planner.activity.ActivityData;
+import com.dev.alex.planner.activity.ActivityRequestPayload;
+import com.dev.alex.planner.activity.ActivityService;
 import com.dev.alex.planner.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
