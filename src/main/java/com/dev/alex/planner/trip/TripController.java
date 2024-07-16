@@ -23,16 +23,15 @@ import java.util.UUID;
 public class TripController {
 
     @Autowired
+    private TripService tripService;
+    @Autowired
     private ParticipantService  participantService;
-
     @Autowired
     private ActivityService activityService;
-
     @Autowired
     private LinkService linkService;
 
     private TripRepository repository;
-
     public TripController(TripRepository repository) {
         this.repository = repository;
     }
@@ -41,10 +40,11 @@ public class TripController {
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
         Trip newTrip = new Trip(payload);
 
-        this.repository.save(newTrip);
+        TripCreateResponse tripCreateResponse = this.tripService.createTripService(newTrip);
+//        this.repository.save(newTrip);
         this.participantService.registerParticipantsToTrip(payload.emails_to_invite(), newTrip);
 
-        return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
+        return ResponseEntity.ok(tripCreateResponse);
     }
 
     @GetMapping("/{id}")
