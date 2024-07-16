@@ -39,9 +39,7 @@ public class TripController {
     @PostMapping
     public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
         Trip newTrip = new Trip(payload);
-
         TripCreateResponse tripCreateResponse = this.tripService.createTripService(newTrip);
-//        this.repository.save(newTrip);
         this.participantService.registerParticipantsToTrip(payload.emails_to_invite(), newTrip);
 
         return ResponseEntity.ok(tripCreateResponse);
@@ -86,6 +84,7 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
+    // participants @endpoints
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipants(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
         var trip = this.repository.findById(id);
@@ -103,6 +102,14 @@ public class TripController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
+
+        return ResponseEntity.ok(participantList);
+    }
+
+    // activities @endpoints
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityCreateResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
         var trip = this.repository.findById(id);
@@ -125,13 +132,7 @@ public class TripController {
         return ResponseEntity.ok(activityList);
     }
 
-    @GetMapping("/{id}/participants")
-    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id) {
-        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
-
-        return ResponseEntity.ok(participantList);
-    }
-
+    // links @endpoints
     @PostMapping("/{id}/links")
     public ResponseEntity<LinkCreateResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
         var trip = this.repository.findById(id);
