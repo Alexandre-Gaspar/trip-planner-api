@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/trips")
@@ -47,13 +48,13 @@ public class TripController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id) {
-        var tripFound = repository.findById(id);
+        var tripFound = this.tripService.findByTripId(id);
         return tripFound.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable UUID id, @RequestBody TripRequestPayload payload) {
-        var tripFound = repository.findById(id);
+        var tripFound = this.tripService.findByTripId(id);
 
         if (tripFound.isPresent()) {
             var rawTrip = tripFound.get();
@@ -61,7 +62,7 @@ public class TripController {
             rawTrip.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
             rawTrip.setDestination(payload.destination());
 
-            this.repository.save(rawTrip);
+            this.tripService.updateTrip(rawTrip);
 
             return ResponseEntity.ok(rawTrip);
         }
@@ -70,13 +71,13 @@ public class TripController {
 
     @GetMapping("/{id}/confirm")
     public ResponseEntity<Trip> confirmTrip(@PathVariable UUID id) {
-        var tripFound = this.repository.findById(id);
+        var tripFound = this.tripService.findByTripId(id);
 
         if (tripFound.isPresent()) {
             var rawTrip = tripFound.get();
             rawTrip.setIsConfirmed(true);
 
-            this.repository.save(rawTrip);
+            this.tripService.updateTrip(rawTrip);
             this.participantService.triggerConfirmationEmailToParticipants(id);
 
             return ResponseEntity.ok(rawTrip);
@@ -87,7 +88,7 @@ public class TripController {
     // participants @endpoints
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipants(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
-        var trip = this.repository.findById(id);
+        var trip = this.tripService.findByTripId(id);
 
         if (trip.isPresent()) {
             Trip rawTrip = trip.get();
@@ -112,7 +113,7 @@ public class TripController {
     // activities @endpoints
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityCreateResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
-        var trip = this.repository.findById(id);
+        var trip = this.tripService.findByTripId(id);
 
         if (trip.isPresent()) {
             Trip rawTrip = trip.get();
@@ -135,7 +136,7 @@ public class TripController {
     // links @endpoints
     @PostMapping("/{id}/links")
     public ResponseEntity<LinkCreateResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
-        var trip = this.repository.findById(id);
+        var trip = this.tripService.findByTripId(id);
 
         if (trip.isPresent()) {
             var rawTrip = trip.get();
