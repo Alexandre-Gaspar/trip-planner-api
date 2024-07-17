@@ -110,6 +110,20 @@ public class TripController {
         return ResponseEntity.ok(participantList);
     }
 
+    @GetMapping("/{id}/participants/confirmed")
+    public ResponseEntity<List<ParticipantData>> getAllParticipantsConfirmed(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
+
+        return ResponseEntity.ok(participantList.stream().filter(participant -> participant.isConfirmed()).toList());
+    }
+
+    @GetMapping("/{id}/participants/unconfirmed")
+    public ResponseEntity<List<ParticipantData>> getAllParticipantsUnconfirmed(@PathVariable UUID id) {
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromTrip(id);
+
+        return ResponseEntity.ok(participantList.stream().filter(participant -> !participant.isConfirmed()).toList());
+    }
+
     // activities @endpoints
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityCreateResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
